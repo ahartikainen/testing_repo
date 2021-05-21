@@ -32,4 +32,4 @@ jobs:
           clang --version || true
 
       - name: Print info
-        run: cat /etc/lsb-release 
+        run: lsb_release -d 
