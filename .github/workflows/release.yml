@@ -33,6 +33,17 @@ jobs:
           echo "CURRENT_ARVIZ_VERSION=$(sed -n 's/^.*__version__\s*=\s*\"\(.*\)\"\.*$/\1/p' arviz/__init__.py)" >> $GITHUB_ENV
           echo ${{ env.CURRENT_ARVIZ_VERSION }}
           
-      - name: Current version 2
-        run: echo ${{ env.CURRENT_ARVIZ_VERSION }}
+          
+          echo "CURRENT_ARVIZ_VERSION_MAJOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\(\d*\)\..*/\1/p')" >> $GITHUB_ENV
+          echo "CURRENT_ARVIZ_VERSION_MINOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\d*\.\(\d*\)\..*/\1/p')" >> $GITHUB_ENV
+          echo "CURRENT_ARVIZ_VERSION_PATCH=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\d*\.\d*\.\(\d*\)[-.].*/\1/p')" >> $GITHUB_ENV
+          
+          
+      - name: Calculate the new version
+        if: "contains(github.event.inputs.new_version, 'major')"
+        run: |
+          echo ${{ env.CURRENT_ARVIZ_VERSION }}
+          echo ${{ env.CURRENT_ARVIZ_VERSION_MAJOR }}
+          echo ${{ env.CURRENT_ARVIZ_VERSION_MINOR }}
+          echo ${{ env.CURRENT_ARVIZ_VERSION_PATCH }}
           
