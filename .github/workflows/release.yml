@@ -64,7 +64,7 @@ jobs:
           echo "NEW_ARVIZ_VERSION=${{ github.event.inputs.new_version }}" >> $GITHUB_ENV
           
       - name: Check new version
-        if: not ${{ env.NEW_ARVIZ_VERSION }}
+        if: ${{ env.NEW_ARVIZ_VERSION == '' }}
         uses: actions/github-script@v3
         with:
           script: |
