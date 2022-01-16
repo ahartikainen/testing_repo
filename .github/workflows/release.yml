@@ -31,5 +31,8 @@ jobs:
       - name: Current version
         run: | 
           echo "CURRENT_ARVIZ_VERSION=$(sed -n 's/^.*__version__\s*=\s*\"\(.*\)\"\.*$/\1/p' arviz/__init__.py)" >> $GITHUB_ENV
-          echo env.CURRENT_ARVIZ_VERSION
+          echo ${{ env.CURRENT_ARVIZ_VERSION }}
+          
+      - name: Current version 2
+        run: echo ${{ env.CURRENT_ARVIZ_VERSION }}
           
