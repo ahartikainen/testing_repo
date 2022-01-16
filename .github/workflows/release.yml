@@ -27,6 +27,11 @@ jobs:
     steps:
       - name: Check out source code
         uses: actions/checkout@v2
+        
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
       
       - name: Current version
         run: | 
@@ -69,3 +74,71 @@ jobs:
         with:
           script: |
               core.setFailed('Invalid version name: ${{ env.NEW_ARVIZ_VERSION }}')
+
+
+      - name: Install dependencies (python)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install wheel
+          python -m pip install --no-cache-dir -r requirements.txt
+          python -m pip install twine
+ 
+      - name: Setup git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+      - name: Create release branch
+        run: |
+          git checkout -b release/v${{ env.NEW_ARVIZ_VERSION }}
+
+          sed -i 's/^__version__ = .*$/__version__ = '\''${{ env.NEW_ARVIZ_VERSION }}'\''/g' arviz/__init__.py
+          
+          git add .
+          git commit -m "release/v${{ env.NEW_ARVIZ_VERSION }}: updating version numbers"
+          git push -u origin release/v${{ env.NEW_ARVIZ_VERSION }}
+          
+      - name: Merge into main
+        run: |
+          git checkout main
+          git reset --hard release/v${{ env.NEW_ARVIZ_VERSION }}
+          git push origin main
+          git branch --delete release/v${{ env.NEW_ARVIZ_VERSION }}
+          # git push origin --delete release/v${{ env.NEW_ARVIZ_VERSION }}
+
+      - name: Tag version
+        run: |
+          git checkout main
+          git tag -a "v${{ env.NEW_ARVIZ_VERSION }}" -m "Tagging v${{ env.NEW_ARVIZ_VERSION }}"
+          git push origin "v${{ env.NEW_ARVIZ_VERSION }}"
+      
+      #- name: Build wheel
+      #  run: python setup.py sdist bdist_wheel
+
+      #- name: Install bdist_wheel
+      #  run: pip install dist/*.whl
+      
+      #- name: Upload to pypi
+      #  if: success()
+      #  env:
+      #    TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+      #    TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      #  run: python -m twine upload -u ${TWINE_USERNAME} -p ${TWINE_PASSWORD} --skip-existing dist/*
+        
+      - name: Rename version to dev
+        run: |
+          git checkout -b rename/v${{ env.NEW_ARVIZ_VERSION }}
+
+          sed -i 's/^__version__ = .*$/__version__ = '\''${{ env.NEW_ARVIZ_VERSION }}-dev'\''/g' arviz/__init__.py
+          
+          git add .
+          git commit -m "rename/v${{ env.NEW_ARVIZ_VERSION }}: updating version to dev"
+          git push -u origin rename/v${{ env.NEW_ARVIZ_VERSION }}
+          
+      - name: Merge rename into main
+        run: |
+          git checkout main
+          git reset --hard rename/v${{ env.NEW_ARVIZ_VERSION }}
+          git push origin main
+          #git branch --delete rename/v${{ env.NEW_ARVIZ_VERSION }}
+          #git push origin --delete rename/v${{ env.NEW_ARVIZ_VERSION }}
