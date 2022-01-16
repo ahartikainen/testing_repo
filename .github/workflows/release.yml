@@ -40,15 +40,32 @@ jobs:
           echo "ARVIZ_OLD_PATCH=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\3/p')" >> $GITHUB_ENV
           
           
-      - name: Calculate the new version
+      - name: Calculate the new version (major)
         if: "contains(github.event.inputs.new_version, 'major')"
         run: |
-          echo "NEW_ARVIZ_VERSION_M=$(echo $((${{ env.ARVIZ_OLD_MAJOR }} + 1)).${{ env.ARVIZ_OLD_MINOR }}.${{ env.ARVIZ_OLD_PATCH }})" >> $GITHUB_ENV
-          echo "NEW_ARVIZ_VERSION_MM=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.$((${{ env.ARVIZ_OLD_MINOR }} + 1)).${{ env.ARVIZ_OLD_PATCH }})" >> $GITHUB_ENV
-          echo "NEW_ARVIZ_VERSION_MMM=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.${{ env.ARVIZ_OLD_MINOR }}.$((${{ env.ARVIZ_OLD_PATCH }} + 1)))" >> $GITHUB_ENV
-          
-      - name: Calculate the new version
+          echo "NEW_ARVIZ_VERSION=$(echo $((${{ env.ARVIZ_OLD_MAJOR }} + 1)).${{ env.ARVIZ_OLD_MINOR }}.${{ env.ARVIZ_OLD_PATCH }})" >> $GITHUB_ENV
+                    
+        
+      - name: Calculate the new version (minor)
+        if: "contains(github.event.inputs.new_version, 'minor')"
         run: |
-          echo ${{ env.NEW_ARVIZ_VERSION_M }}
-          echo ${{ env.NEW_ARVIZ_VERSION_MM }}
-          echo ${{ env.NEW_ARVIZ_VERSION_MMM }}
+          echo "NEW_ARVIZ_VERSION=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.$((${{ env.ARVIZ_OLD_MINOR }} + 1)).${{ env.ARVIZ_OLD_PATCH }})" >> $GITHUB_ENV
+          
+          
+      - name: Calculate the new version (patch)
+        if: "contains(github.event.inputs.new_version, 'patch')"
+        run: |
+          echo "NEW_ARVIZ_VERSION=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.${{ env.ARVIZ_OLD_MINOR }}.$((${{ env.ARVIZ_OLD_PATCH }} + 1)))" >> $GITHUB_ENV
+      
+      
+      - name: Calculate the new version (custom)
+        if: "contains(github.event.inputs.new_version, 'custom')"
+        run: |
+          echo "NEW_ARVIZ_VERSION=${{ github.event.inputs.new_version }}" >> $GITHUB_ENV
+          
+      - name: Check new version
+        if: not ${{ env.NEW_ARVIZ_VERSION }}
+        uses: actions/github-script@v3
+        with:
+          script: |
+              core.setFailed('Invalid version name: ${{ env.NEW_ARVIZ_VERSION }}')
