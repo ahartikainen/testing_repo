@@ -1,0 +1,35 @@
+name: ReleaseArviZ
+
+on:
+  workflow_dispatch:
+    inputs:
+      new_version:
+        description: 'New major, minor, patch or custom release'
+        options: 
+        - major
+        - minor
+        - patch
+        - custom
+        required: true
+      custom_version:
+        description: 'New custom release version'
+        required: false
+
+jobs:
+  release-arviz:
+    name: Publish release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.9]
+      fail-fast: false
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2
+      
+      - name: Current version
+        run: | 
+          echo "CURRENT_ARVIZ_VERSION=$(sed -n 's/^.*__version__\s*=\s*\"\(.*\)\"\.*$/\1/p' arviz/__init__.py)" >> $GITHUB_ENV
+          echo env.CURRENT_ARVIZ_VERSION
+          
