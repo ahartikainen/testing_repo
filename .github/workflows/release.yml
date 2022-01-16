@@ -35,9 +35,9 @@ jobs:
         
       - name: Split current version
         run: | 
-          echo "CURRENT_ARVIZ_VERSION_MAJOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\(\d*\)\..*/\1/p')" >> $GITHUB_ENV
-          echo "CURRENT_ARVIZ_VERSION_MINOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\d*\.\(\d*\)\..*/\1/p')" >> $GITHUB_ENV
-          echo "CURRENT_ARVIZ_VERSION_PATCH=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\d*\.\d*\.\(\d*\)[-.].*/\1/p')" >> $GITHUB_ENV
+          echo "CURRENT_ARVIZ_VERSION_MAJOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\1/p')" >> $GITHUB_ENV
+          echo "CURRENT_ARVIZ_VERSION_MINOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\2/p')" >> $GITHUB_ENV
+          echo "CURRENT_ARVIZ_VERSION_PATCH=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\3/p')" >> $GITHUB_ENV
           
           
       - name: Calculate the new version
