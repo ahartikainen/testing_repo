@@ -35,16 +35,20 @@ jobs:
         
       - name: Split current version
         run: | 
-          echo "CURRENT_ARVIZ_VERSION_MAJOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\1/p')" >> $GITHUB_ENV
-          echo "CURRENT_ARVIZ_VERSION_MINOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\2/p')" >> $GITHUB_ENV
-          echo "CURRENT_ARVIZ_VERSION_PATCH=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\3/p')" >> $GITHUB_ENV
+          echo "ARVIZ_OLD_MAJOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\1/p')" >> $GITHUB_ENV
+          echo "ARVIZ_OLD_MINOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\2/p')" >> $GITHUB_ENV
+          echo "ARVIZ_OLD_PATCH=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\3/p')" >> $GITHUB_ENV
           
           
       - name: Calculate the new version
         if: "contains(github.event.inputs.new_version, 'major')"
         run: |
-          echo ${{ env.CURRENT_ARVIZ_VERSION }}
-          echo ${{ env.CURRENT_ARVIZ_VERSION_MAJOR }}
-          echo ${{ env.CURRENT_ARVIZ_VERSION_MINOR }}
-          echo ${{ env.CURRENT_ARVIZ_VERSION_PATCH }}
+          echo "NEW_ARVIZ_VERSION_M=$(echo $((${{ env.ARVIZ_OLD_MAJOR }} + 1)).${{ env.ARVIZ_OLD_MINOR }}.${{ env.ARVIZ_OLD_PATCH }}" >> $GITHUB_ENV
+          echo "NEW_ARVIZ_VERSION_MM=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.$((${{ env.ARVIZ_OLD_MINOR }} + 1)).${{ env.ARVIZ_OLD_PATCH }}" >> $GITHUB_ENV
+          echo "NEW_ARVIZ_VERSION_MMM=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.${{ env.ARVIZ_OLD_MINOR }}.$((${{ env.ARVIZ_OLD_PATCH }} + 1))" >> $GITHUB_ENV
           
+      - name: Calculate the new version
+        run: |
+          echo ${{ env.NEW_ARVIZ_VERSION_M }}
+          echo ${{ env.NEW_ARVIZ_VERSION_MM }}
+          echo ${{ env.NEW_ARVIZ_VERSION_MMM }}
