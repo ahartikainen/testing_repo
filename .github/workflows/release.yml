@@ -43,9 +43,9 @@ jobs:
       - name: Calculate the new version
         if: "contains(github.event.inputs.new_version, 'major')"
         run: |
-          echo "NEW_ARVIZ_VERSION_M=$(echo $((${{ env.ARVIZ_OLD_MAJOR }} + 1)).${{ env.ARVIZ_OLD_MINOR }}.${{ env.ARVIZ_OLD_PATCH }}" >> $GITHUB_ENV
-          echo "NEW_ARVIZ_VERSION_MM=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.$((${{ env.ARVIZ_OLD_MINOR }} + 1)).${{ env.ARVIZ_OLD_PATCH }}" >> $GITHUB_ENV
-          echo "NEW_ARVIZ_VERSION_MMM=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.${{ env.ARVIZ_OLD_MINOR }}.$((${{ env.ARVIZ_OLD_PATCH }} + 1))" >> $GITHUB_ENV
+          echo "NEW_ARVIZ_VERSION_M=$(echo $((${{ env.ARVIZ_OLD_MAJOR }} + 1)).${{ env.ARVIZ_OLD_MINOR }}.${{ env.ARVIZ_OLD_PATCH }})" >> $GITHUB_ENV
+          echo "NEW_ARVIZ_VERSION_MM=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.$((${{ env.ARVIZ_OLD_MINOR }} + 1)).${{ env.ARVIZ_OLD_PATCH }})" >> $GITHUB_ENV
+          echo "NEW_ARVIZ_VERSION_MMM=$(echo ${{ env.ARVIZ_OLD_MAJOR }}.${{ env.ARVIZ_OLD_MINOR }}.$((${{ env.ARVIZ_OLD_PATCH }} + 1)))" >> $GITHUB_ENV
           
       - name: Calculate the new version
         run: |
