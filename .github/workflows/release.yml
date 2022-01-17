@@ -72,10 +72,10 @@ jobs:
       - name: Calculate the new version (custom)
         if: "contains(github.event.inputs.new_version, 'custom')"
         run: |
-          echo "NEW_ARVIZ_VERSION=${{ github.event.inputs.custom }}" >> $GITHUB_ENV
+          echo "NEW_ARVIZ_VERSION=${{ github.event.inputs.custom_version }}" >> $GITHUB_ENV
           
       - name: Check custom
-        if: ${{ (github.event.inputs.new_version == 'custom') && (github.event.inputs.custom == '') }}
+        if: ${{ (github.event.inputs.new_version == 'custom') && (github.event.inputs.custom_version == '') }}
         uses: actions/github-script@v3
         with:
           script: |
