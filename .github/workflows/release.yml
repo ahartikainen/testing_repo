@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       new_version:
+        type: choice
         description: 'New major, minor, patch or custom release'
         options: 
         - major
@@ -14,6 +15,11 @@ on:
       custom_version:
         description: 'New custom release version'
         required: false
+      upload_pypi:
+        type: boolean
+        description: 'Upload release to PyPI'
+        required: true
+        default: true
 
 jobs:
   release-arviz:
