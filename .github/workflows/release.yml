@@ -128,7 +128,8 @@ jobs:
         #run: python setup.py sdist bdist_wheel
 
       - name: Install bdist_wheel
-        run: pip install dist/*.whl
+        run: echo "Install here"
+      #  run: pip install dist/*.whl
       
       - name: Upload to pypi
         if: ${{ success() && (github.event.inputs.new_version != 'custom') }}
