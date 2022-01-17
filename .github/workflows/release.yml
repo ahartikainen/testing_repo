@@ -48,9 +48,12 @@ jobs:
         
       - name: Split current version
         run: | 
-          pattern_major='s/([0-9]+).([0-9]+).([0-9]+)/\1/p'
-          pattern_minor='s/([0-9]+).([0-9]+).([0-9]+)/\2/p'
-          pattern_patch='s/([0-9]+).([0-9]+).([0-9]+)/\3/p'
+          pattern_major='s/\\([0-9]\\+\\).\\([0-9]\\+\\).\\([0-9]\\+\\)/\1/p'
+          pattern_minor='s/\\([0-9]\\+\\).\\([0-9]\\+\\).\\([0-9]\\+\\)/\2/p'
+          pattern_patch='s/\\([0-9]\\+\\).\\([0-9]\\+\\).\\([0-9]\\+\\)/\3/p'
+          echo $pattern_major
+          echo $pattern_minor
+          echo $pattern_patch
           echo "ARVIZ_OLD_MAJOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n $pattern_major)" >> $GITHUB_ENV
           echo "ARVIZ_OLD_MINOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n $pattern_minor)" >> $GITHUB_ENV
           echo "ARVIZ_OLD_PATCH=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -n $pattern_patch)" >> $GITHUB_ENV
