@@ -13,7 +13,7 @@ on:
         - custom
         required: true
       custom_version:
-        description: 'New custom release version'
+        description: 'New custom release version (pypi not supported)'
         required: false
       upload_pypi:
         type: boolean
@@ -72,18 +72,22 @@ jobs:
       - name: Calculate the new version (custom)
         if: "contains(github.event.inputs.new_version, 'custom')"
         run: |
-          echo "CUSTOM_ARVIZ_VERSION_VALID=$(echo ${{ github.event.inputs.custom }} | sed -nE 's/__version__\s*=\s*.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p')" >> $GITHUB_ENV
           echo "NEW_ARVIZ_VERSION=${{ github.event.inputs.custom }}" >> $GITHUB_ENV
           
-
-      - name: Check new version
-        if: ${{ (env.NEW_ARVIZ_VERSION == '') || (env.NEW_ARVIZ_VERSION == '1..') || (env.NEW_ARVIZ_VERSION == '.1.') || (env.NEW_ARVIZ_VERSION == '..1') || (env.CUSTOM_ARVIZ_VERSION_VALID == '') }}
+      - name: Check custom
+        if: ${{ (github.event.inputs.new_version == 'custom') && (github.event.inputs.custom == '') }}
         uses: actions/github-script@v3
         with:
           script: |
-              core.setFailed('Invalid version name: ${{ env.NEW_ARVIZ_VERSION }}')
+              core.setFailed('Invalid custom version name: ${{ env.NEW_ARVIZ_VERSION }}')
 
-              
+      - name: Check new version
+        if: ${{ (github.event.inputs.new_version != 'custom') && ((env.NEW_ARVIZ_VERSION == '') || (env.NEW_ARVIZ_VERSION == '1..') || (env.NEW_ARVIZ_VERSION == '.1.') || (env.NEW_ARVIZ_VERSION == '..1')) }}
+        uses: actions/github-script@v3
+        with:
+          script: |
+              core.setFailed('Invalid version name: ${{ env.NEW_ARVIZ_VERSION }}')          
+      
       - name: Install dependencies (python)
         run: |
           python -m pip install --upgrade pip
@@ -119,20 +123,23 @@ jobs:
           git tag -a "v${{ env.NEW_ARVIZ_VERSION }}" -m "Tagging v${{ env.NEW_ARVIZ_VERSION }}"
           git push origin "v${{ env.NEW_ARVIZ_VERSION }}"
       
-      #- name: Build wheel
-      #  run: python setup.py sdist bdist_wheel
+      - name: Build wheel
+        run: echo "Building here"
+        #run: python setup.py sdist bdist_wheel
 
-      #- name: Install bdist_wheel
-      #  run: pip install dist/*.whl
+      - name: Install bdist_wheel
+        run: pip install dist/*.whl
       
-      #- name: Upload to pypi
-      #  if: success()
-      #  env:
-      #    TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-      #    TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: Upload to pypi
+        if: ${{ success() && (github.event.inputs.new_version != 'custom') }}
+        #env:
+        #  TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        #  TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: echo "HERE"
       #  run: python -m twine upload -u ${TWINE_USERNAME} -p ${TWINE_PASSWORD} --skip-existing dist/*
         
       - name: Rename version to dev
+        if: ${{ github.event.inputs.new_version != 'custom' }}
         run: |
           git checkout -b rename/v${{ env.NEW_ARVIZ_VERSION }}
 
@@ -143,8 +150,28 @@ jobs:
           git push -u origin rename/v${{ env.NEW_ARVIZ_VERSION }}
           
       - name: Merge rename into main
+        if: ${{ github.event.inputs.new_version != 'custom' }}
         run: |
           git checkout main
           git reset --hard rename/v${{ env.NEW_ARVIZ_VERSION }}
           git push origin main
           git push origin --delete rename/v${{ env.NEW_ARVIZ_VERSION }}
+          
+      - name: Rename version to dev (custom release)
+        if: ${{ github.event.inputs.new_version == 'custom' }}
+        run: |
+          git checkout -b rename/v${{ env.CURRENT_ARVIZ_VERSION }}
+
+          sed -i 's/^__version__ = .*$/__version__ = "${{ env.CURRENT_ARVIZ_VERSION }}-dev"/g' arviz/__init__.py
+          
+          git add .
+          git commit -m "rename/v${{ env.CURRENT_ARVIZ_VERSION }}: reverse version to dev"
+          git push -u origin rename/v${{ env.CURRENT_ARVIZ_VERSION }}
+          
+      - name: Merge rename into main
+        if: ${{ github.event.inputs.new_version == 'custom' }}
+        run: |
+          git checkout main
+          git reset --hard rename/v${{ env.CURRENT_ARVIZ_VERSION }}
+          git push origin main
+          git push origin --delete rename/v${{ env.CURRENT_ARVIZ_VERSION }}
