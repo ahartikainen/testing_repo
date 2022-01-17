@@ -74,6 +74,14 @@ jobs:
         run: |
           echo "NEW_ARVIZ_VERSION=${{ github.event.inputs.new_version }}" >> $GITHUB_ENV
           
+      - name: Validate version format
+        run: |
+          echo Current ${{ env.CURRENT_ARVIZ_VERSION }} 
+          echo New ${{ env.NEW_ARVIZ_VERSION }} 
+          echo Major ${{ env.ARVIZ_OLD_MAJOR }} 
+          echo Minor ${{ env.ARVIZ_OLD_MINOR }} 
+          echo Patch ${{ env.ARVIZ_OLD_PATCH }} 
+          
       - name: Check new version
         if: ${{ env.NEW_ARVIZ_VERSION == '' }}
         uses: actions/github-script@v3
@@ -81,9 +89,6 @@ jobs:
           script: |
               core.setFailed('Invalid version name: ${{ env.NEW_ARVIZ_VERSION }}')
 
-      - name: Validate version format
-        run: |
-          echo ${{ env.NEW_ARVIZ_VERSION }}    
               
       - name: Install dependencies (python)
         run: |
