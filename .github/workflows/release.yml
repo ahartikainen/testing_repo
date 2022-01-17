@@ -72,11 +72,12 @@ jobs:
       - name: Calculate the new version (custom)
         if: "contains(github.event.inputs.new_version, 'custom')"
         run: |
-          echo "NEW_ARVIZ_VERSION=${{ github.event.inputs.new_version }}" >> $GITHUB_ENV
+          echo "CUSTOM_ARVIZ_VERSION_VALID=$(echo ${{ github.event.inputs.custom }} | sed -nE 's/__version__\s*=\s*.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p')" >> $GITHUB_ENV
+          echo "NEW_ARVIZ_VERSION=${{ github.event.inputs.custom }}" >> $GITHUB_ENV
           
 
       - name: Check new version
-        if: ${{ (env.NEW_ARVIZ_VERSION == '') || (env.NEW_ARVIZ_VERSION == '1..') || (env.NEW_ARVIZ_VERSION == '.1.') || (env.NEW_ARVIZ_VERSION == '..1') }}
+        if: ${{ (env.NEW_ARVIZ_VERSION == '') || (env.NEW_ARVIZ_VERSION == '1..') || (env.NEW_ARVIZ_VERSION == '.1.') || (env.NEW_ARVIZ_VERSION == '..1') || (env.CUSTOM_ARVIZ_VERSION_VALID == '') }}
         uses: actions/github-script@v3
         with:
           script: |
