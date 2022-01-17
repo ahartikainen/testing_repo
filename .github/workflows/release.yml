@@ -46,7 +46,6 @@ jobs:
         
       - name: Split current version
         run: | 
-          echo ${{ env.CURRENT_ARVIZ_VERSION }}
           echo "ARVIZ_OLD_MAJOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -nE 's/([0-9]+)\.([0-9]+)\.([0-9]+).*/\1/p')" >> $GITHUB_ENV
           echo "ARVIZ_OLD_MINOR=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -nE 's/([0-9]+)\.([0-9]+)\.([0-9]+).*/\2/p')" >> $GITHUB_ENV
           echo "ARVIZ_OLD_PATCH=$(echo ${{ env.CURRENT_ARVIZ_VERSION }} | sed -nE 's/([0-9]+)\.([0-9]+)\.([0-9]+).*/\3/p')" >> $GITHUB_ENV
@@ -75,16 +74,9 @@ jobs:
         run: |
           echo "NEW_ARVIZ_VERSION=${{ github.event.inputs.new_version }}" >> $GITHUB_ENV
           
-      - name: Validate version format
-        run: |
-          echo Current ${{ env.CURRENT_ARVIZ_VERSION }} 
-          echo New ${{ env.NEW_ARVIZ_VERSION }} 
-          echo Major ${{ env.ARVIZ_OLD_MAJOR }} 
-          echo Minor ${{ env.ARVIZ_OLD_MINOR }} 
-          echo Patch ${{ env.ARVIZ_OLD_PATCH }} 
-          
+
       - name: Check new version
-        if: ${{ env.NEW_ARVIZ_VERSION == '' }}
+        if: ${{ (env.NEW_ARVIZ_VERSION == '') || (env.NEW_ARVIZ_VERSION == '1..') || (env.NEW_ARVIZ_VERSION == '.1.') || (env.NEW_ARVIZ_VERSION == '..1') }}
         uses: actions/github-script@v3
         with:
           script: |
@@ -118,8 +110,7 @@ jobs:
           git checkout main
           git reset --hard release/v${{ env.NEW_ARVIZ_VERSION }}
           git push origin main
-          git branch --delete release/v${{ env.NEW_ARVIZ_VERSION }}
-          # git push origin --delete release/v${{ env.NEW_ARVIZ_VERSION }}
+          git push origin --delete release/v${{ env.NEW_ARVIZ_VERSION }}
 
       - name: Tag version
         run: |
@@ -155,5 +146,4 @@ jobs:
           git checkout main
           git reset --hard rename/v${{ env.NEW_ARVIZ_VERSION }}
           git push origin main
-          #git branch --delete rename/v${{ env.NEW_ARVIZ_VERSION }}
-          #git push origin --delete rename/v${{ env.NEW_ARVIZ_VERSION }}
+          git push origin --delete rename/v${{ env.NEW_ARVIZ_VERSION }}
