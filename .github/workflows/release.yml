@@ -41,7 +41,7 @@ jobs:
       
       - name: Current version
         run: | 
-          echo "CURRENT_ARVIZ_VERSION=$(sed -n 's/^.*__version__\s*=\s*\"\(.*\)\".*$/\1/p' arviz/__init__.py)" >> $GITHUB_ENV
+          echo "CURRENT_ARVIZ_VERSION=$(sed -n 's/^.*__version__\s*=\s*[\"']\(.*\)[\"'].*$/\1/p' arviz/__init__.py)" >> $GITHUB_ENV
         
         
       - name: Split current version
@@ -106,7 +106,7 @@ jobs:
         run: |
           git checkout -b release/v${{ env.NEW_ARVIZ_VERSION }}
 
-          sed -i 's/^__version__ = .*$/__version__ = '\''${{ env.NEW_ARVIZ_VERSION }}'\''/g' arviz/__init__.py
+          sed -i 's/^__version__ = .*$/__version__ = "${{ env.NEW_ARVIZ_VERSION }}"/g' arviz/__init__.py
           
           git add .
           git commit -m "release/v${{ env.NEW_ARVIZ_VERSION }}: updating version numbers"
@@ -143,7 +143,7 @@ jobs:
         run: |
           git checkout -b rename/v${{ env.NEW_ARVIZ_VERSION }}
 
-          sed -i 's/^__version__ = .*$/__version__ = '\''${{ env.NEW_ARVIZ_VERSION }}-dev'\''/g' arviz/__init__.py
+          sed -i 's/^__version__ = .*$/__version__ = "${{ env.NEW_ARVIZ_VERSION }}-dev"/g' arviz/__init__.py
           
           git add .
           git commit -m "rename/v${{ env.NEW_ARVIZ_VERSION }}: updating version to dev"
